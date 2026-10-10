@@ -31,6 +31,7 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_HEAP_OPTS: "-Xms512m -Xmx1g"
     ports:
       - 9092:9092
 
@@ -53,9 +54,10 @@ services:
   schema-registry:
     image: confluentinc/cp-schema-registry:5.5.3
     environment:
-      - SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL=zookeeper:2181
-      - SCHEMA_REGISTRY_HOST_NAME=schema-registry
-      - SCHEMA_REGISTRY_LISTENERS=http://schema-registry:8081,http://localhost:8081
+      SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: zookeeper:2181
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_LISTENERS: "http://schema-registry:8081,http://localhost:8081"
+      SCHEMA_REGISTRY_HEAP_OPTS: "-Xms256m -Xmx512m"
     ports:
       - 8081:8081
     depends_on: [zookeeper, kafka]
