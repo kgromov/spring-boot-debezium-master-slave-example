@@ -2,19 +2,17 @@ package com.youtube.javapuzzle.service;
 
 import com.youtube.javapuzzle.entity.Customer;
 import com.youtube.javapuzzle.repository.CustomerRepository;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class CustomerService {
     private final CustomerRepository customerRepository;
-
-    @Autowired
-    public CustomerService(CustomerRepository customerRepository) {
-        this.customerRepository = customerRepository;
-    }
 
     public List<Customer> getAllCustomers() {
         return customerRepository.findAll();
@@ -30,12 +28,12 @@ public class CustomerService {
     }
 
     public Customer updateCustomer(Long id, Customer updatedCustomer) {
-        // You can add additional validation or business logic here
-        if (customerRepository.existsById(id)) {
-            updatedCustomer.setId(id);
-            return customerRepository.save(updatedCustomer);
-        }
-        return new Customer(); // or throw an exception indicating not found
+        return customerRepository.findById(id)
+                .map(customer -> {
+                    customer.setFullName(updatedCustomer.getFullName());
+                    customer.setEmail(updatedCustomer.getEmail());
+                    return customerRepository.save(customer);
+                }).orElseThrow(() -> new EntityNotFoundException("Customer not found"));
     }
 
     public void deleteCustomer(Long id) {

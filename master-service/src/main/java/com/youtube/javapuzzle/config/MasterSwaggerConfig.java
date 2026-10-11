@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class MasterSwaggerConfig {
+
     @Bean
     public GroupedOpenApi customOpenAPI() {
         return GroupedOpenApi.builder()

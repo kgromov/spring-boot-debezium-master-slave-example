@@ -1,5 +1,6 @@
 package com.youtube.javapuzzle.config;
 
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
@@ -7,10 +8,12 @@ import org.springframework.core.env.Environment;
 import java.io.File;
 import java.io.IOException;
 
+@EnableConfigurationProperties(SlaveConnectorProperties.class)
 @Configuration
 public class DebeziumConnectorConfig {
+
     @Bean
-    public io.debezium.config.Configuration customerConnector(Environment env) throws IOException {
+    public io.debezium.config.Configuration customerConnector(SlaveConnectorProperties connectorProperties) throws IOException {
         var offsetStorageTempFile = File.createTempFile("offsets_", ".dat");
         return io.debezium.config.Configuration.create()
             .with("name", "customer_postgres_connector")
@@ -18,11 +21,11 @@ public class DebeziumConnectorConfig {
             .with("offset.storage", "org.apache.kafka.connect.storage.FileOffsetBackingStore")
             .with("offset.storage.file.filename", offsetStorageTempFile.getAbsolutePath())
             .with("offset.flush.interval.ms", "60000")
-            .with("database.hostname", env.getProperty("slave.datasource.host"))
-            .with("database.port", env.getProperty("slave.datasource.port")) // defaults to 5432
-            .with("database.user", env.getProperty("slave.datasource.username"))
-            .with("database.password", env.getProperty("slave.datasource.password"))
-            .with("database.dbname", env.getProperty("slave.datasource.database"))
+            .with("database.hostname", connectorProperties.getHost())
+            .with("database.port", connectorProperties.getPort())
+            .with("database.user", connectorProperties.getUsername())
+            .with("database.password", connectorProperties.getPassword())
+            .with("database.dbname", connectorProperties.getDatabase())
             .with("database.server.id", "10181")
             .with("database.server.name", "customer-postgres-db-server")
             .with("topic.prefix", "slave-postgresql")

@@ -4,19 +4,21 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.youtube.javapuzzle.entity.Customer;
 import com.youtube.javapuzzle.repository.CustomerRepository;
 import io.debezium.data.Envelope;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class CustomerService {
     private final CustomerRepository customerRepository;
-    @Autowired
-    public CustomerService(CustomerRepository customerRepository) {
-        this.customerRepository = customerRepository;
-    }
+    private final ObjectMapper objectMapper;
 
     public List<Customer> getAllCustomers() {
         return customerRepository.findAll();
@@ -32,12 +34,12 @@ public class CustomerService {
     }
 
     public Customer updateCustomer(Long id, Customer updatedCustomer) {
-        // You can add additional validation or business logic here
-        if (customerRepository.existsById(id)) {
-            updatedCustomer.setId(id);
-            return customerRepository.save(updatedCustomer);
-        }
-        return new Customer(); // or throw an exception indicating not found
+       return customerRepository.findById(id)
+                .map(customer -> {
+                    customer.setFullName(updatedCustomer.getFullName());
+                    customer.setEmail(updatedCustomer.getEmail());
+                    return customerRepository.save(customer);
+                }).orElseThrow(() -> new EntityNotFoundException("Customer not found"));
     }
 
     public void deleteCustomer(Long id) {
@@ -45,18 +47,20 @@ public class CustomerService {
     }
 
     public void replicateData(Map<String, Object> customerData, Envelope.Operation operation) {
-        final ObjectMapper mapper = new ObjectMapper();
-        final Customer customer = mapToCustomer(customerData);
-        System.out.println(customer);
+//        final ObjectMapper mapper = new ObjectMapper();
+//        final Customer customer = mapToCustomer(customerData);
+        var customer = objectMapper.convertValue(customerData, Customer.class);
+        log.info("Customer = {}", customer);
         if (Envelope.Operation.DELETE == operation) {
-            System.out.println("delete the record");
+            log.info("delete the record");
             customerRepository.deleteById(customer.getId());
         } else {
-            System.out.println("inserting the record");
+            log.info("inserting the record");
             customerRepository.save(customer);
         }
     }
 
+    // TODO: should be moved to mapper
     public static Customer mapToCustomer(Map<String, Object> map) {
         Customer customer = new Customer();
 
