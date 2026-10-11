@@ -10,14 +10,21 @@ services:
       - POSTGRES_DB=debezium_master
 
   pgadmin:
-        image: dpage/pgadmin4
-        environment: 
-            - PGADMIN_DEFAULT_EMAIL=pgadmin4@javapuzzle.com
-            - PGADMIN_DEFAULT_PASSWORD=admin1234
-        ports:
-            - '5051:80'
-        restart: always
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=pgadmin4@javapuzzle.com
+      - PGADMIN_DEFAULT_PASSWORD=admin1234
+    ports:
+      - '5051:80'
+    restart: always
 
+  mysql:
+    image: mysql:8.3.0
+    ports:
+      - 3307:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=debezium_slave
 
   zookeeper:
     image: confluentinc/cp-zookeeper:5.5.3
@@ -26,7 +33,7 @@ services:
 
   kafka:
     image: confluentinc/cp-enterprise-kafka:5.5.3
-    depends_on: [zookeeper]
+    depends_on: [ zookeeper ]
     environment:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
@@ -46,7 +53,7 @@ services:
       VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
       CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
       CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
-    depends_on: [kafka]
+    depends_on: [ kafka ]
     ports:
       - 8083:8083
 
@@ -60,7 +67,7 @@ services:
       SCHEMA_REGISTRY_HEAP_OPTS: "-Xms256m -Xmx512m"
     ports:
       - 8081:8081
-    depends_on: [zookeeper, kafka]
+    depends_on: [ zookeeper, kafka ]
 
   kafka-ui:
     container_name: kafka-ui

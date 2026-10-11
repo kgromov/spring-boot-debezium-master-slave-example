@@ -32,6 +32,7 @@ public class DebeziumListener {
     private final Executor executor = Executors.newSingleThreadExecutor();    
     private final DebeziumEngine<RecordChangeEvent<SourceRecord>> debeziumEngine;
     private final CustomerService customerService;
+
     public DebeziumListener(Configuration customerConnectorConfiguration, CustomerService customerService) {
         this.customerService = customerService;
         this.debeziumEngine = DebeziumEngine.create(ChangeEventFormat.of(Connect.class))
