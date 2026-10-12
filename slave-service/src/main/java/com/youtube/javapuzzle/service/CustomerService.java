@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 
 @Slf4j
 @Service
@@ -47,8 +46,6 @@ public class CustomerService {
     }
 
     public void replicateData(Map<String, Object> customerData, Envelope.Operation operation) {
-//        final ObjectMapper mapper = new ObjectMapper();
-//        final Customer customer = mapToCustomer(customerData);
         var customer = objectMapper.convertValue(customerData, Customer.class);
         log.info("Customer = {}", customer);
         if (Envelope.Operation.DELETE == operation) {
@@ -58,24 +55,5 @@ public class CustomerService {
             log.info("inserting the record");
             customerRepository.save(customer);
         }
-    }
-
-    // TODO: should be moved to mapper
-    public static Customer mapToCustomer(Map<String, Object> map) {
-        Customer customer = new Customer();
-
-        if (map.containsKey("id") && map.get("id") instanceof Number) {
-            customer.setId(((Number) map.get("id")).longValue());
-        }
-
-        if (map.containsKey("full_name") && map.get("full_name") instanceof String) {
-            customer.setFullName((String) map.get("full_name"));
-        }
-
-        if (map.containsKey("email") && map.get("email") instanceof String) {
-            customer.setEmail((String) map.get("email"));
-        }
-
-        return customer;
     }
 }
