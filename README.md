@@ -1,5 +1,15 @@
 # Debezium Installation with Spring Boot, Postgresql and Mysql
 
+## What is Debezium?
+
+Debezium is an open-source distributed platform for capturing real-time changes in databases. It provides a way to stream database changes as events, which can be consumed by other applications for real-time data processing, analytics, or other purposes.   
+It works by setting up a Debezium connector that monitors the database and sends changes as events to a Kafka topic.    
+So on quite low level by reading database logs. Connector is needed on consumer side to add listener (consumer listen to events from producer side via connector).
+
+## Setup and env
+With embedded `DebeziumEngine` implementation it's actually required to have only connector to input/producer datasource (in our case postgres) and consumer side (in our case mysql) that consumes events from producer side but in-memory. So no kafka needed as well as zookeeper and debezium itself. So full docker-compose setup is rather for reference to show closer to real life setup.    
+Datasources setup via docker compose and used trick to create db if missed - `createDatabaseIfNotExist` flag that apparently supported by both postgres and mysql.
+
 [![Debezium Installation with Spring Boot, Postgresql and Mysql](https://img.youtube.com/vi/gurxMenlj9E/maxresdefault.jpg)](https://youtu.be/gurxMenlj9E)
 ## [See full youtube video](https://youtu.be/gurxMenlj9E)
 
