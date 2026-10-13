@@ -16,6 +16,7 @@ import org.apache.kafka.connect.source.SourceRecord;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.Executor;
@@ -38,6 +39,12 @@ public class DebeziumListener {
         this.debeziumEngine = DebeziumEngine.create(ChangeEventFormat.of(Connect.class))
                 .using(customerConnectorConfiguration.asProperties())
                 .notifying(this::handleChangeEvent)
+                .notifying(changeConsumer -> new DebeziumEngine.ChangeConsumer<RecordChangeEvent<SourceRecord>>() {
+                    @Override
+                    public void handleBatch(List<RecordChangeEvent<SourceRecord>> records, DebeziumEngine.RecordCommitter<RecordChangeEvent<SourceRecord>> committer) throws InterruptedException {
+
+                    }
+                })
                 .build();
     }
 

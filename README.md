@@ -6,8 +6,12 @@ Debezium is an open-source distributed platform for capturing real-time changes 
 It works by setting up a Debezium connector that monitors the database and sends changes as events to a Kafka topic.    
 So on quite low level by reading database logs. Connector is needed on consumer side to add listener (consumer listen to events from producer side via connector).
 
+Debezium is built on top of Apache Kafka and provides a set of Kafka Connect compatible connectors. Each of the connectors works with a specific database management system (DBMS). Connectors record the history of data changes in the DBMS by detecting changes as they occur, and streaming a record of each change event to a Kafka topic. Consuming applications can then read the resulting event records from the Kafka topic.
+
 ## Setup and env
-With embedded `DebeziumEngine` implementation it's actually required to have only connector to input/producer datasource (in our case postgres) and consumer side (in our case mysql) that consumes events from producer side but in-memory. So no kafka needed as well as zookeeper and debezium itself. So full docker-compose setup is rather for reference to show closer to real life setup.    
+With embedded `DebeziumEngine` implementation it's actually required to have only connector to input/producer datasource (in our case postgres) and consumer side (in our case mysql) that consumes events from producer side but in-memory. So no kafka needed as well as zookeeper and debezium itself. So full docker-compose setup is rather for reference to show closer to real life setup:
+>A mechanism for running a single Kafka Connect SourceConnector within an application's process. An embedded connector is entirely standalone and only talks with the source system; no Kafka, Kafka Connect, or Zookeeper processes are needed. Applications using an embedded connector simply set one up and supply a consumer function to which the connector will pass all SourceRecords containing database change events.
+
 Datasources setup via docker compose and used trick to create db if missed - `createDatabaseIfNotExist` flag that apparently supported by both postgres and mysql.
 
 [![Debezium Installation with Spring Boot, Postgresql and Mysql](https://img.youtube.com/vi/gurxMenlj9E/maxresdefault.jpg)](https://youtu.be/gurxMenlj9E)
