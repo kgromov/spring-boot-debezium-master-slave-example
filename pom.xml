@@ -26,10 +26,21 @@
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<springdoc-openapi.version>2.0.3</springdoc-openapi.version>
-		<debezium.version>2.4.0.Final</debezium.version>
+		<debezium.version>3.7.0.Final</debezium.version> <!-- 3.7.0.Final -->
 		<mapstruct.version>1.4.2.Final</mapstruct.version>
-		<apache.commons.version>3.12.0</apache.commons.version>
 	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>io.debezium</groupId>
+				<artifactId>debezium-bom</artifactId>
+				<version>${debezium.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
 	<dependencies>
 		<dependency>
@@ -49,11 +60,6 @@
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
 			<version>${springdoc-openapi.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-lang3</artifactId>
-			<version>${apache.commons.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
