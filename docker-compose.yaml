@@ -32,21 +32,34 @@ services:
       ZOOKEEPER_CLIENT_PORT: 2181
 
   kafka:
-    image: confluentinc/cp-enterprise-kafka:5.5.3
+    image: confluentinc/cp-kafka:7.5.0
     depends_on: [ zookeeper ]
     environment:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_HEAP_OPTS: "-Xms512m -Xmx1g"
     ports:
       - 9092:9092
+      - 29092:29092
+
+#  connect:
+#    image: quay.io/debezium/connect:2.7
+#    depends_on: [ kafka, postgres ]
+#    ports: [ "8083:8083" ]
+#    environment:
+#      BOOTSTRAP_SERVERS: kafka:9092
+#      GROUP_ID: connect-cluster
+#      CONFIG_STORAGE_TOPIC: connect_configs
+#      OFFSET_STORAGE_TOPIC: connect_offsets
+#      STATUS_STORAGE_TOPIC: connect_statuses
 
   debezium:
     image: debezium/connect:1.4
     environment:
       BOOTSTRAP_SERVERS: kafka:9092
-      GROUP_ID: 1
+      GROUP_ID: consumer-postgres-1
       CONFIG_STORAGE_TOPIC: connect_configs
       OFFSET_STORAGE_TOPIC: connect_offsets
       KEY_CONVERTER: io.confluent.connect.avro.AvroConverter
@@ -59,9 +72,10 @@ services:
 
 
   schema-registry:
-    image: confluentinc/cp-schema-registry:5.5.3
+    image: confluentinc/cp-schema-registry:7.5.0
     environment:
       SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: zookeeper:2181
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: PLAINTEXT://kafka:9092
       SCHEMA_REGISTRY_HOST_NAME: schema-registry
       SCHEMA_REGISTRY_LISTENERS: "http://schema-registry:8081,http://localhost:8081"
       SCHEMA_REGISTRY_HEAP_OPTS: "-Xms256m -Xmx512m"

@@ -3,7 +3,6 @@ package com.youtube.javapuzzle.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.youtube.javapuzzle.entity.Customer;
 import com.youtube.javapuzzle.repository.CustomerRepository;
-import io.debezium.data.Envelope;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,10 +44,10 @@ public class CustomerService {
         customerRepository.deleteById(id);
     }
 
-    public void replicateData(Map<String, Object> customerData, Envelope.Operation operation) {
+    public void replicateData(Map<String, Object> customerData, Object operation) {
         var customer = objectMapper.convertValue(customerData, Customer.class);
         log.info("Customer = {}", customer);
-        if (Envelope.Operation.DELETE == operation) {
+        if (operation == operation) {
             log.info("delete the record");
             customerRepository.deleteById(customer.getId());
         } else {
