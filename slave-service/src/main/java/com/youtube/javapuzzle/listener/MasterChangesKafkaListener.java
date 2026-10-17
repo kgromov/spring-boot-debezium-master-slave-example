@@ -1,6 +1,7 @@
 package com.youtube.javapuzzle.listener;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.youtube.javapuzzle.model.CustomerChangeEvent;
 import com.youtube.javapuzzle.model.CustomerChanges;
 import com.youtube.javapuzzle.service.CustomerService;
 import lombok.RequiredArgsConstructor;
@@ -22,5 +23,12 @@ public class MasterChangesKafkaListener {
     public void onMasterChanges(Message<String> message) {
         CustomerChanges changes = objectMapper.readerFor(CustomerChanges.class).readValue(message.getPayload());
         customerService.replicateData(changes);
+    }
+
+    @SneakyThrows
+    @KafkaListener(topics = "postgres.public.customer")
+    public void onMasterChanges2(Message<String> message) {
+        CustomerChangeEvent changeEvent = objectMapper.readerFor(CustomerChangeEvent.class).readValue(message.getPayload());
+        customerService.replicateData(changeEvent);
     }
 }

@@ -2,7 +2,9 @@ package com.youtube.javapuzzle.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.youtube.javapuzzle.entity.Customer;
+import com.youtube.javapuzzle.model.CustomerChangeEvent;
 import com.youtube.javapuzzle.model.CustomerChanges;
+import com.youtube.javapuzzle.model.Operation;
 import com.youtube.javapuzzle.repository.CustomerRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -48,6 +50,14 @@ public class CustomerService {
         switch (changes.getOperation()) {
             case CREATE, UPDATE -> customerRepository.save(objectMapper.convertValue(changes, Customer.class));
             case DELETE -> customerRepository.deleteById(changes.getId());
+            default -> throw new IllegalArgumentException("Invalid operation: " + changes.getOperation());
+        }
+    }
+
+    public void replicateData(CustomerChangeEvent changes) {
+        switch (changes.getOperation()) {
+            case CREATE, UPDATE -> customerRepository.save(changes.getAfter());
+            case DELETE -> customerRepository.deleteById(changes.getBefore().getId());
             default -> throw new IllegalArgumentException("Invalid operation: " + changes.getOperation());
         }
     }
