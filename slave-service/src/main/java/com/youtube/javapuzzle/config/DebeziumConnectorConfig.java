@@ -11,6 +11,10 @@ import java.io.IOException;
 @Configuration
 public class DebeziumConnectorConfig {
 
+    /*
+     * This is equivalent to debezium.json with more details/customizations and offset.storage.
+     * debesium publishes connector.json (and actually worker config.json) itself with kafka REST.
+     */
     @Bean
     public io.debezium.config.Configuration customerConnector(SlaveConnectorProperties connectorProperties) throws IOException {
         var offsetStorageTempFile = File.createTempFile("offsets_", ".dat");

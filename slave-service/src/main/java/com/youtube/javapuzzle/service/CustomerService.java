@@ -55,5 +55,6 @@ public class CustomerService {
             log.info("inserting the record");
             customerRepository.save(customer);
         }
+
     }
 }

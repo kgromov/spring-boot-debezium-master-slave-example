@@ -38,18 +38,22 @@ public class DebeziumListener {
         this.customerService = customerService;
         this.debeziumEngine = DebeziumEngine.create(ChangeEventFormat.of(Connect.class))
                 .using(customerConnectorConfiguration.asProperties())
-                .notifying(this::handleChangeEvent)
-                .notifying(changeConsumer -> new DebeziumEngine.ChangeConsumer<RecordChangeEvent<SourceRecord>>() {
-                    @Override
-                    public void handleBatch(List<RecordChangeEvent<SourceRecord>> records, DebeziumEngine.RecordCommitter<RecordChangeEvent<SourceRecord>> committer) throws InterruptedException {
-
-                    }
-                })
+                .notifying(this::handleSingleChange)
+                .notifying(this::handleBatch)
                 .build();
     }
 
-    private void handleChangeEvent(RecordChangeEvent<SourceRecord> sourceRecordRecordChangeEvent) {
-        var sourceRecord = sourceRecordRecordChangeEvent.record();
+    public void handleBatch(
+            List<RecordChangeEvent<SourceRecord>> records,
+            DebeziumEngine.RecordCommitter<RecordChangeEvent<SourceRecord>> committer
+    ) throws InterruptedException {
+        records.forEach(this::handleSingleChange);
+        committer.markProcessed(records.get(records.size() - 1));
+        committer.markBatchFinished();
+    }
+
+    private void handleSingleChange(RecordChangeEvent<SourceRecord> sourceRecordChangeEvent) {
+        var sourceRecord = sourceRecordChangeEvent.record();
         log.info("Key = {}, Value = {}", sourceRecord.key(), sourceRecord.value());
         var sourceRecordChangeValue = (Struct) sourceRecord.value();
         log.info("SourceRecordChangeValue = '{}'", sourceRecordChangeValue);

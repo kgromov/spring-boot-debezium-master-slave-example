@@ -4,10 +4,11 @@ import com.youtube.javapuzzle.entity.Customer;
 import com.youtube.javapuzzle.repository.CustomerRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
@@ -38,5 +39,17 @@ public class CustomerService {
 
     public void deleteCustomer(Long id) {
         customerRepository.deleteById(id);
+    }
+
+    @Transactional
+    public void batchCreate(Integer count) {
+        var customers = IntStream.rangeClosed(0, count)
+                .boxed()
+                .map(i -> Customer.builder()
+                        .fullName("Customer " + i)
+                        .email("customer" + i + "@example.com")
+                        .build())
+                .toList();
+        customerRepository.saveAll(customers);
     }
 }

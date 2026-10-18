@@ -44,4 +44,10 @@ public class CustomerController {
         customerService.deleteCustomer(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/batch")
+    public ResponseEntity<Void> batchCreate(@RequestParam(required = false, defaultValue = "10") Integer count) {
+        customerService.batchCreate(count);
+        return ResponseEntity.ok().build();
+    }
 }
