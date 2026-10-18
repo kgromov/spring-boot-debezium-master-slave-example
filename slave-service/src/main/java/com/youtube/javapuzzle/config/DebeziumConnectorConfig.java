@@ -30,7 +30,6 @@ public class DebeziumConnectorConfig {
             .with("database.password", connectorProperties.getPassword())
             .with("database.dbname", connectorProperties.getDatabase())
             .with("database.server.id", "10181")
-            .with("database.server.name", "customer-postgres-db-server")
             .with("topic.prefix", "slave-postgresql")
             .with("database.history", "io.debezium.relational.history.MemoryDatabaseHistory")
 //            .with("table.include.list", "public.claims")

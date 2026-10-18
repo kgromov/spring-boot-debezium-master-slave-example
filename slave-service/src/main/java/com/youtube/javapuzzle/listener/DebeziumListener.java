@@ -43,6 +43,7 @@ public class DebeziumListener {
                 .build();
     }
 
+    // FIXME: exclude/deduplicate reads; add batch db processing
     public void handleBatch(
             List<RecordChangeEvent<SourceRecord>> records,
             DebeziumEngine.RecordCommitter<RecordChangeEvent<SourceRecord>> committer

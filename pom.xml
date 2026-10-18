@@ -28,6 +28,7 @@
 		<springdoc-openapi.version>2.0.3</springdoc-openapi.version>
 		<debezium.version>3.7.0.Final</debezium.version> <!-- 3.7.0.Final -->
 		<mapstruct.version>1.4.2.Final</mapstruct.version>
+		<postgresql.version>42.7.6</postgresql.version>
 	</properties>
 
 	<dependencyManagement>
