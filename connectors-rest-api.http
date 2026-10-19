@@ -1,0 +1,16 @@
+# curl -s http://localhost:8083/connectors
+GET http://localhost:8083/connectors
+
+###
+# curl -s http://localhost:8083/connectors/postgres-connector/config
+GET http://localhost:8083/connectors/customer_postgres_connector/config
+
+###
+# curl -s http://localhost:8083/connectors/postgres-connector/status
+GET http://localhost:8083/connectors/customer_postgres_connector/status
+
+###
+# curl -s http://localhost:8083/connector-plugins
+GET http://localhost:8083/connector-plugins
+
+
