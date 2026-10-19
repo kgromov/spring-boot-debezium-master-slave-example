@@ -1,7 +1,6 @@
-version: "3.7"
 services:
   postgres:
-    image: debezium/postgres:13
+    image: debezium/postgres:17-alpine
     ports:
       - 5432:5432
     environment:
@@ -45,33 +44,17 @@ services:
       - 29092:29092
 
   debezium:
-    image: debezium/connect:1.4
+    image: debezium/connect:3.0.0.Final
     environment:
       BOOTSTRAP_SERVERS: kafka:9092
-      GROUP_ID: consumer-postgres-1
+      GROUP_ID: 1
       CONFIG_STORAGE_TOPIC: connect_configs
       OFFSET_STORAGE_TOPIC: connect_offsets
-      # FIXME: since avro is not used in the code - it's better to use another converters - e.g Json and delete schema registry service
-      KEY_CONVERTER: io.confluent.connect.avro.AvroConverter
-      VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
-      CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
-      CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
+      KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
     depends_on: [ kafka ]
     ports:
       - 8083:8083
-
-
-  schema-registry:
-    image: confluentinc/cp-schema-registry:7.5.0
-    environment:
-      SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: zookeeper:2181
-      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: PLAINTEXT://kafka:9092
-      SCHEMA_REGISTRY_HOST_NAME: schema-registry
-      SCHEMA_REGISTRY_LISTENERS: "http://schema-registry:8081,http://localhost:8081"
-      SCHEMA_REGISTRY_HEAP_OPTS: "-Xms256m -Xmx512m"
-    ports:
-      - 8081:8081
-    depends_on: [ zookeeper, kafka ]
 
   kafka-ui:
     container_name: kafka-ui
@@ -80,7 +63,6 @@ services:
       - 8086:8080
     depends_on:
       - kafka
-      - schema-registry
     environment:
       KAFKA_CLUSTERS_NAME: local
       KAFKA_CLUSTERS_BOOTSTRAPSERVERS: kafka:9092
